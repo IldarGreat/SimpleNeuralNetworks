@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy
 import scipy.special
+import matplotlib.pyplot as plt
 
 class neuralNetwork:
 
@@ -51,15 +52,32 @@ class neuralNetwork:
     pass
 
 
-n = neuralNetwork(3, 3, 3, 0.35)
-print("Before train")
-print("Query network:",n.query([3.2,2.1,-0.2]))
-#print(n.who)
-#print(n.wih)
-for i in range(1000):
-    n.train([3.2,2.1,-0.2], [5.6,0.3,0])
+# Создание объекта нейронной сети
+input_nodes = 784
+hidden_nodes = 100
+output_nodes = 10
+network = neuralNetwork(input_nodes, hidden_nodes, output_nodes, 0.35)
+data_train_file = open("mnist_dataset/mnist_train_100.csv",'r')
+data_values = data_train_file.readlines()
+data_train_file.close()
+
+# Тренировка сети
+for record in data_values:
+    data_value = record.split(",")
+    inputs = (numpy.asfarray(data_value[1:])/255.0*0.99)+0.01
+    targets = numpy.zeros(output_nodes) + 0.1
+    targets[int(data_value[0])] = 0.99
+    network.train(inputs,targets)
     pass
-print("After train")
-print("Query network:",n.query([3.2,2.1,-0.2]))
-#print(n.who)
-#print(n.wih)
+    
+# Тестирование сети
+data_test_file = open("mnist_dataset/mnist_test_10.csv",'r')
+test_values = data_test_file.readlines()
+data_train_file.close()
+    
+test_value = test_values[3].split(',')
+image_array = numpy.asfarray(test_value[1:]).reshape((28,28))
+plt.imshow(image_array,cmap = 'Greys',interpolation = "nearest")
+inputs_data = numpy.asfarray(test_value[1:])/255.0*0.99 + 0.1
+
+print(network.query(inputs_data))
